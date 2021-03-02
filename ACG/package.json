@@ -1,0 +1,41 @@
+{
+  "name": "javascript-call-graph",
+  "version": "1.0.0",
+  "description": "This project implements a field-based call graph construction algorithm for JavaScript as described in",
+  "main": "jcg.js",
+  "dependencies": {
+    "amdefine": "^1.0.1",
+    "argparse": "^1.0.10",
+    "body-parser": "^1.18.2",
+    "escodegen": "^1.10.0",
+    "esprima": "^4.0.0",
+    "express": "^4.16.3",
+    "npm": "^5.10.0",
+    "sloc": "^0.2.0",
+    "source-map": "^0.7.3",
+    "JSONStream": "1.3.3"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-flow": "^6.23.0",
+    "jest": "^23.1.0"
+  },
+  "scripts": {
+    "test": "jest && python3 ./tests/test.py"
+  },
+  "jest": {
+    "testRegex": "tests/jest/.*\\.(js|jsx)$"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Persper/javascript-call-graph.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Persper/javascript-call-graph/issues"
+  },
+  "homepage": "https://github.com/Persper/javascript-call-graph#readme"
+}

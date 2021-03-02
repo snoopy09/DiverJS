@@ -1,0 +1,55 @@
+{
+  "name": "simplecrawler",
+  "description": "Very straightforward web crawler. Uses EventEmitter. Generates queue statistics and has a basic cache mechanism with extensible backend.",
+  "version": "0.7.0",
+  "homepage": "https://github.com/cgiffard/node-simplecrawler",
+  "author": "Christopher Giffard <christopher.giffard@cgiffard.com>",
+  "maintainers": [
+    "Christopher Giffard <christopher.giffard@cgiffard.com>",
+    "Fredrik Ekelund <fredrik@fredrik.computer>"
+  ],
+  "license": "BSD-2-Clause",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cgiffard/node-simplecrawler.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cgiffard/node-simplecrawler/issues"
+  },
+  "keywords": [
+    "simple",
+    "crawler",
+    "spider",
+    "cache",
+    "queue",
+    "simplecrawler",
+    "eventemitter"
+  ],
+  "scripts": {
+    "lint": "eslint example/ lib/ test/",
+    "mocha": "mocha -R spec -t 5000",
+    "test": "npm run lint && npm run mocha"
+  },
+  "bin": {
+    "crawl": "./lib/cli.js"
+  },
+  "main": "./lib/index.js",
+  "dependencies": {
+    "iconv-lite": "^0.4.13",
+    "node-fs": "^0.1.7",
+    "robots-parser": "^1.0.0",
+    "socksv5": "0.0.6",
+    "urijs": "^1.16.1"
+  },
+  "devDependencies": {
+    "chai": "^3.2.0",
+    "eslint": "^2.0.0",
+    "mocha": "^2.3.2"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "files": [
+    "lib"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "NNconsts": {
+    "buffer_size": 3,
+    "batch_size": 3,
+    "gamma": 0.9,
+    "report_interval": 1,
+    "epsilon": 0.3
+  },
+  "estimate_func": "Linear",
+  "repeat_learning": true,
+  "maxExecStep": 50,
+  "maxEps": 10,
+  "actions": [
+    "_propagateCEPT",
+    "_ASE2010",
+    "_selectHighRewardsInput",
+    "_selectFirstRequest",
+    "_selectRequestSeq_diff",
+    "_selectRequestSeq",
+    "_selectHighRewardsSeq",
+    "_selectCbOrder_diff",
+    "_selectCbOrder",
+    "_selectHighRewardsOrder"
+  ],
+  "rewards": {
+    "cover": 3,
+    "coverTBranch": 10,
+    "coverFBranch": 10,
+    "coverChange": 100,
+    "execChange(<=10)": 10,
+    "execChange": 0,
+    "coverCb": 3,
+    "coverCbPair": 1,
+    "execBlockinNewCb": 1,
+    "execChangedBlockinNewCb": 5,
+    "coverReq": 5,
+    "coverReqPair": 3,
+    "prop": 500,
+    "noRewards": -100,
+    "noInput": 0,
+    "notFinish": 0,
+    "find": 100000
+  },
+  "random": false,
+  "stateConsts": {
+    "nodeLen": 1000,
+    "histryLen": 10,
+    "pathLen": 100
+  }
+}

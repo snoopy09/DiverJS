@@ -1,0 +1,30 @@
+{
+  "NNconsts": {
+    "buffer_size": 3,
+    "batch_size": 3,
+    "gamma": 0.9,
+    "report_interval": 1,
+    "epsilon": 0.3
+  },
+  "estimate_func": "Linear",
+  "maxExecStep": 100,
+  "maxEps": 1,
+  "actions": ["INPUT", "REQUEST", "CALLBACK"],
+  "rewards": {
+    "coverA": 1,
+    "execChangeA": 3,
+    "execNewChangeA": 10,
+    "coverB": 1,
+    "execChangeB": 3,
+    "execNewChangeB": 10,
+    "prop": 5,
+    "noInput": 0,
+    "notFinish": 0,
+    "find": 1000
+  },
+  "random": true,
+  "stateConsts": {
+    "histryLen": 10,
+    "pathLen": 100
+  }
+}

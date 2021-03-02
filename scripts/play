@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+export Z3_PATH="./node_modules/z3javascript/bin/libz3.dylib"
+cd Analyser
+rm -rf tmp
+mkdir -p tmp
+# cat "" > ./../tmp.log
+# node ./node_modules/jalangi2/src/js/commands/jalangi.js --inlineIID --inlineSource --analysis bin/Analyser.js "${@:1}" >> ./../tmp.log 2>&1
+node ./node_modules/jalangi2/src/js/commands/jalangi.js --inlineIID --inlineSource --analysis bin/Analyser.js "${@:1}" >> ${EXPOSE_LOG_PATH} 2>&1

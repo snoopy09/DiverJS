@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+cd reachable/src
+
+CLASSPATH=.:jgrapht-core-1.3.1.jar:jackson-core-2.9.9.jar:jackson-databind-2.9.9.jar:jackson-annotations-2.9.9.jar
+export CLASSPATH
+
+# javac ExposeTest.java -classpath .:jgrapht-core-1.3.1.jar:jackson-core-2.9.9.jar:jackson-databind-2.9.9.jar
+# jar cfm calcHB.jar manifest.mf *.class
+javac ExposeTest.java
+# jar cfm calcHB.jar manifest.mf *.class
+# java -jar calcHB.jar "${@:1}"
+echo "" > "./../../log.txt"
+java ExposeTest "${@:1}" >> "./../../log.txt" 2>&1
+# java ExposeTest "${@:1}"
+cd ../../

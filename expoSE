@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+function abs_target {
+    if [[ ${1} =~ ^https?://.+ ]]; then
+        echo $1
+    else
+        #Generate the absolute path of test script
+        cd "$2"
+        cd "$(dirname "$1")"
+        echo "$(printf "%s/%s\n" "$(pwd)" "$(basename "$1")")"
+    fi
+}
+
+#Store the current working directory to return after calculating abspath
+ORIGIN_PATH="$(pwd)"
+
+#cd to ExpoSE directory
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+export Z3_PATH="./Distributor/node_modules/z3javascript/bin/libz3.dylib"
+
+
+if [[ ${EXPOSE_LOG_LEVEL} && ${EXPOSE_LOG_LEVEL-x} ]]; then
+	RECOMPILE="1"
+  # recompileするならz3のパス通す
+  # installしなおすと一部ディレクトリが消えちゃう
+  # cp -r Analyser/node_modules/z3javascript Distributor/node_modules/z3javascript
+  # cp -r Analyser/node_modules/ref Distributor/node_modules/ref
+fi
+
+#If the RECOMPILE flag is set then call the recompile script
+if [[ ${RECOMPILE} && ${RECOMPILE-x} ]]; then
+
+	./scripts/build/build_all
+
+	if [ $? -ne 0 ]; then
+		exit 1
+	fi
+
+fi
+
+if [ "$1" == "ui" ]; then #Launch the user interface
+
+    export PATH=$PATH:$(pwd)
+    (cd Dashboard && npm start);
+	exit $?
+
+elif [ "$1" == "ahg" ]; then
+
+	NODE_PATH="$NODE_PATH:$ORIGIN_PATH/node_modules" EXPOSE_QUERY_DUMP=$EXPOSE_QUERY_DUMP EXPOSE_HARNESS_TARGET=$2 ./scripts/analyse ../lib/Harness/src/harness.js "${@:3}"
+
+elif [ "$1" == "replay" ]; then
+
+	./scripts/play "$(abs_target $2 $ORIGIN_PATH)" "${@:3}"
+	exit $?
+
+else
+
+	if [[ $1 =~ ^http(s)?:// ]]; then #Web URL, launch web mode
+		echo "Web Mode, Starting Proxy"
+		. ./scripts/run_proxy
+		EXPOSE_PLAY_SCRIPT="./scripts/play_electron"
+		if [[ -z ${MITM_PID} ]]; then
+			exit 1
+		fi
+	fi
+
+  # EXPOSE_LOG_LEVEL=3 LEARNING=1 LEARNING_ACTION_FILE=ActionSwitch_diff.js LEARNING_STATE_FILE=LearningState.js LEARNING_ENV_FILE=learningEnvLinear.json expoSE outputs/node-logger-file mytests/node-logger-file test
+    EXPOSE_PLAY_SCRIPT=${EXPOSE_PLAY_SCRIPT} EXPOSE_QUERY_DUMP=$EXPOSE_QUERY_DUMP LEARNING=$LEARNING LEARNING_ACTION_FILE=$LEARNING_ACTION_FILE LEARNING_STATE_FILE=$LEARNING_STATE_FILE LEARNING_ENV_FILE=$LEARNING_ENV_FILE ./scripts/analyse $@
+    OUT_CODE=$?
+
+    if [[ ! -z $MITM_PID ]]; then
+        echo "Killing server"
+        kill -9 $MITM_PID
+				rm "${MITM_FILE}"
+    fi
+
+    exit $OUT_CODE
+fi

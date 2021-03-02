@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+
+if [ ${LEARNING} == "1" ]; then
+  pyenv local 2.7.0
+fi
+
+dir=$1
+targetDir=$2
+
+# Create CFG with ACG
+for file in ${@:3}
+do
+  # Remove comment from code
+  if [ ! -e $targetDir/dirA/$file ]; then
+    cp $targetDir/dirB/$file $targetDir/dirA/$file
+  fi
+  if [ ! -e $targetDir/dirB/$file ]; then
+    cp $targetDir/dirA/$file $targetDir/dirB/$file
+  fi
+  node StaticAnalysis/deleteComments.js $targetDir/dirA/$file
+  node StaticAnalysis/deleteComments.js $targetDir/dirB/$file
+  echo "+$targetDir/dirA/$file" >> $dir/graphs/callgraph/toolLog/acgA.filter
+  echo "+$targetDir/dirB/$file" >> $dir/graphs/callgraph/toolLog/acgB.filter
+done
+cd ACG
+node jcg --cg "$targetDir"/dirA/ --filter $dir/graphs/callgraph/toolLog/acgA.filter --strategy DEMAND --output $dir/graphs/callgraph/callgraph_A.json >> $dir/graphs/callgraph/toolLog/ACG_A.log
+node jcg --cg "$targetDir"/dirB/ --filter $dir/graphs/callgraph/toolLog/acgB.filter --strategy DEMAND --output $dir/graphs/callgraph/callgraph_B.json >> $dir/graphs/callgraph/toolLog/ACG_B.log
+cd ..
+
+# call create_graph
+# Analyse CFG
+a="/"
+b="$"
+for file in ${@:3}
+do
+  dirId=${file//$a/$b}
+  mkdir "$dir"/graphs/"$dirId"
+  mkdir "$dir"/graphs/"$dirId"/toolLog
+
+  # Create CFG with TAJS
+  cd TAJS
+  rm -rf ./out
+  java -jar dist/tajs-all.jar $targetDir/dirA/$file -flowgraph > $dir/graphs/"$dirId"/toolLog/TAJS_A.log
+  cp out/flowgraphs/final $dir/graphs/"$dirId"/flowgraphs_A
+  cp out/flowgraphs/locMap.json $dir/graphs/"$dirId"/locMap_A.json
+  # dot -T png $dir/graphs/"$dirId"/flowgraphs_A -o $dir/graphs/"$dirId"/flowgraphs_A.png # Convert dot to png (for debugging)
+  java -jar dist/tajs-all.jar $targetDir/dirB/$file -flowgraph > $dir/graphs/"$dirId"/toolLog/TAJS_B.log
+  cp out/flowgraphs/final $dir/graphs/"$dirId"/flowgraphs_B
+  cp out/flowgraphs/locMap.json $dir/graphs/"$dirId"/locMap_B.json
+  # dot -T png $dir/graphs/"$dirId"/flowgraphs_B -o $dir/graphs/"$dirId"/flowgraphs_B.png # Convert dot to png (for debugging)
+  cd ..
+
+  python StaticAnalysis/analyseCFG.py $dir $dirId $targetDir/dirA/$file $targetDir/dirB/$file >> $dir/interGraphs/pythonLog.log 2>&1
+done
+
+
+if [ ${LEARNING} == "1" ]; then
+  pyenv local 3.5.0
+fi

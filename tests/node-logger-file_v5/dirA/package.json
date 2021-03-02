@@ -1,0 +1,38 @@
+{
+	"name": "cinovo-logger-file",
+	"version": "0.2.6",
+	"description": "File endpoint for cinovo-logger.",
+	"keywords": [
+		"logger",
+		"file"
+	],
+	"author": {
+		"name": "Michael Wittig",
+		"email": "michael.wittig@cinovo.de"
+	},
+	"contributors": [],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cinovo/node-logger-file.git"
+	},
+	"dependencies": {
+		"cinovo-logger": ">=0.2.2 <0.3.x",
+		"cinovo-logger-lib": "^0.2.1"
+	},
+	"devDependencies": {
+		"assert-plus": "^0.1.3",
+		"mocha": "1.11.0",
+		"node-uuid": "1.4.0"
+	},
+	"main": "index",
+	"engines": {
+		"node": ">= 0.6.0"
+	},
+	"scripts": {
+		"test": "rm -Rf test/log/* && mocha --timeout 5000 test/*"
+	},
+	"readmeFilename": "README.md",
+	"bugs": {
+		"url": "https://github.com/cinovo/node-logger-file/issues"
+	}
+}

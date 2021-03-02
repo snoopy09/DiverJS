@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+
+# Setup runtime environment variables
+source ./scripts/env
+
+
+# EXPOSE_LOG_LEVEL=3 LEARNING=0 LEARNING_ACTION_FILE=EnvFiles/ActionSwitch/diff.js LEARNING_ENV_FILE=EnvFiles/LearningEnv/exec50.json expoSE outputs/mkdirp mytests/mkdirp test
+
+# Create directory
+middir=$PWD/"$1"/`date +"%Y-%m-%d"`
+dir=$middir/`date +"%H:%M:%S"`
+mkdir -p $1
+mkdir -p $middir
+mkdir $dir
+
+mkdir "$dir"/graphs
+mkdir "$dir"/interGraphs
+mkdir "$dir"/jalangiLogA
+mkdir "$dir"/jalangiLogB
+# mkdir "$dir"/paramCSV
+mkdir "$dir"/HBjson
+
+
+echo "" > $dir/info.log
+
+if [[ ${LEARNING_STATE_FILE} ]]; then
+  cp $LEARNING_STATE_FILE $dir/LearningState.js
+  echo "LEARNING_STATE_FILE: " >> $dir/info.log
+  echo $LEARNING_STATE_FILE >> $dir/info.log
+  echo "" >> $dir/info.log
+fi
+if [[ ${LEARNING_ACTION_FILE} ]]; then
+  cp $LEARNING_ACTION_FILE $dir/ActionSwitch.js
+  echo "LEARNING_ACTION_FILE: " >> $dir/info.log
+  echo $LEARNING_ACTION_FILE >> $dir/info.log
+  echo "" >> $dir/info.log
+fi
+if [[ ${LEARNING_ENV_FILE} ]]; then
+  cp $LEARNING_ENV_FILE $dir/LearningEnv.json
+  echo "LEARNING_ENV_FILE: " >> $dir/info.log
+  echo $LEARNING_ENV_FILE >> $dir/info.log
+  echo "" >> $dir/info.log
+fi
+
+pyenv local 2.7.0
+
+file=$3
+
+# Create CFG with ACG
+mkdir $dir/graphs/callgraph
+mkdir $dir/graphs/callgraph/toolLog
+echo "-.*" > $dir/graphs/callgraph/toolLog/acgA.filter
+echo "-.*" > $dir/graphs/callgraph/toolLog/acgB.filter
+# Remove comment from code
+node StaticAnalysis/deleteComments.js $PWD/"$2"/dirA/"$file".js
+node StaticAnalysis/deleteComments.js $PWD/"$2"/dirB/"$file".js
+echo "+$PWD/$2/dirA/$file.js" >> $dir/graphs/callgraph/toolLog/acgA.filter
+echo "+$PWD/$2/dirB/$file.js" >> $dir/graphs/callgraph/toolLog/acgB.filter
+cd ACG
+node jcg --cg ./../"$2"/dirA/ --filter $dir/graphs/callgraph/toolLog/acgA.filter --strategy DEMAND --output $dir/graphs/callgraph/callgraph_A.json > $dir/graphs/callgraph/toolLog/ACG_A.log
+node jcg --cg ./../"$2"/dirB/ --filter $dir/graphs/callgraph/toolLog/acgB.filter --strategy DEMAND --output $dir/graphs/callgraph/callgraph_B.json > $dir/graphs/callgraph/toolLog/ACG_B.log
+cd ..
+
+# call create_graph
+# Analyse CFG
+a="/"
+b="$"
+dirId=${file//$a/$b}
+mkdir "$dir"/graphs/"$dirId"
+mkdir "$dir"/graphs/"$dirId"/toolLog
+
+# Create CFG with TAJS
+cd TAJS
+rm -rf ./out
+java -jar dist/tajs-all.jar ./../"$2"/dirA/"$file".js -flowgraph > $dir/graphs/"$dirId"/toolLog/TAJS_A.log
+cp out/flowgraphs/final $dir/graphs/"$dirId"/flowgraphs_A
+cp out/flowgraphs/locMap.json $dir/graphs/"$dirId"/locMap_A.json
+# dot -T png $dir/graphs/"$dirId"/flowgraphs_A -o $dir/graphs/"$dirId"/flowgraphs_A.png # Convert dot to png (for debugging)
+java -jar dist/tajs-all.jar ./../"$2"/dirB/"$file".js -flowgraph > $dir/graphs/"$dirId"/toolLog/TAJS_B.log
+cp out/flowgraphs/final $dir/graphs/"$dirId"/flowgraphs_B
+cp out/flowgraphs/locMap.json $dir/graphs/"$dirId"/locMap_B.json
+# dot -T png $dir/graphs/"$dirId"/flowgraphs_B -o $dir/graphs/"$dirId"/flowgraphs_B.png # Convert dot to png (for debugging)
+cd ..
+
+python StaticAnalysis/analyseCFG.py $dir $dirId $PWD/"$2"/dirA/"$file".js $PWD/"$2"/dirB/"$file".js >> $dir/interGraphs/pythonLog.log 2>&1
+
+# if [ $OUT_CODE -ne 0 ]; then
+#   echo "Oops..."
+#   break
+# fi
+
+if [ ${LEARNING} == "1" ]; then
+  pyenv local 3.5.0
+fi
+
+
+# Invoke analyser
+# for i in `seq 1`
+for i in `seq 0 100`
+do
+  node --max_old_space_size=4096 Distributor/bin/Distributor.js $PWD/"$2"/dirA/"$file".js $PWD/"$2"/dirB/"$file".js $PWD/"$2" $dir $i
+
+  OUT_CODE=$?
+
+  if [ $OUT_CODE -ne 0 ]; then
+    node calcAverage1.js $dir/execRecord.json $dir/result.json
+    echo "Oops..."
+    break
+  fi
+
+done

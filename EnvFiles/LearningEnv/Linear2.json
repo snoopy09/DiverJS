@@ -1,0 +1,49 @@
+{
+  "NNconsts": {
+    "buffer_size": 30,
+    "batch_size": 30,
+    "gamma": 0.8,
+    "report_interval": 1,
+    "epsilon": 0.1
+  },
+  "estimate_func": "Linear",
+  "repeat_learning": true,
+  "maxExecStep": 20,
+  "maxEps": 100,
+  "actions": [
+    "INPUT",
+    "REQUEST",
+    "CALLBACK"
+  ],
+  "rewards": {
+    "cover": 3,
+    "coverTBranch": 10,
+    "coverFBranch": 10,
+    "coverChange": 1000,
+    "execChange(<=10)": 100,
+    "execChange": 10,
+    "coverCb": 3,
+    "coverCbPair": 1,
+    "execBlockinNewCb": 1,
+    "execChangedBlockinNewCb": 5,
+    "coverReq": 5,
+    "coverReqPair": 3,
+    "readNewVariable": 3,
+    "readNewValue": 0,
+    "readNewBranch": 1,
+    "useNewVariableInBranch": 1,
+    "readNewOutput": 1,
+    "useNewVariableInOutput": 1,
+    "prop": 500,
+    "noRewards": 0,
+    "noInput": 0,
+    "notFinish": 0,
+    "find": 1000000
+  },
+  "random": false,
+  "stateConsts": {
+    "nodeLen": 1000,
+    "histryLen": 10,
+    "pathLen": 100
+  }
+}

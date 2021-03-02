@@ -1,0 +1,30 @@
+{
+  "NNconsts": {
+    "buffer_size": 10,
+    "batch_size": 10,
+    "gamma": 0.9,
+    "report_interval": 1,
+    "epsilon": 0.3
+  },
+  "estimate_func": "NN",
+  "maxExecStep": 10,
+  "maxEps": 10,
+  "actions": ["ASE", "SYMJS", "PROP"],
+  "rewards": {
+    "coverA": 1,
+    "execChangeA": 3,
+    "execNewChangeA": 10,
+    "coverB": 1,
+    "execChangeB": 3,
+    "execNewChangeB": 10,
+    "prop": 5,
+    "noInput": 0,
+    "notFinish": 0,
+    "find": 1000
+  },
+  "random": false,
+  "stateConsts": {
+    "histryLen": 10,
+    "pathLen": 100
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "instruments": [
+    {
+      "pathA": "index_targetA_jalangi_",
+      "pathB": "index_targetB_jalangi_"
+    }
+  ],
+  "require": [
+    {
+      "pathA": "index_targetA_jalangi_",
+      "pathB": "index_targetB_jalangi_",
+      "name": "mkdirp"
+    }
+  ],
+  "events": [
+    {
+      "func": "mkdirp",
+      "args": [
+        {
+          "symbolic": true,
+          "code": "'./foo'"
+        },
+        {
+          "symbolic": true,
+          "code": "0755"
+        },
+        {
+          "symbolic": false,
+          "code": "'err => { console.log(err); }'"
+        }
+      ]
+    }
+  ]
+}
